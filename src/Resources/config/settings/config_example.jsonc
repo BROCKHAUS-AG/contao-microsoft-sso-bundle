@@ -1,0 +1,11 @@
+{
+  "oauth": {
+    "clientId": "",
+    "clientSecret": "",
+    "hostname": "",
+    "postUrl": "/oauth2/v2.0/token"
+  },
+  "group": {
+    "id": ""
+  }
+}

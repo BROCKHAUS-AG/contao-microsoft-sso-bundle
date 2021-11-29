@@ -1,0 +1,13 @@
+services:
+    BrockhausAg\ContaoMicrosoftSsoBundle\Controller\AdfsController:
+        arguments:
+            - '@contao.framework'
+            - '@security.token_storage'
+            - '@twig'
+            - '@database_connection'
+            - '@event_dispatcher'
+            - '@logger'
+            - '@request_stack'
+        public: true
+        calls:
+            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]

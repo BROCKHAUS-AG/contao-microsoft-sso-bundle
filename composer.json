@@ -1,0 +1,51 @@
+{
+    "version": "1.0",
+    "name": "brockhaus-ag/contao-microsoft-sso-bundle",
+    "description": "Mit dem Contao Microsoft SSO Bundle der BROCKHAUS AG, können Sie sich ganz bequem per SSO im Contao Backend anmelden.",
+    "homepage": "https://www.brockhaus-ag.de",
+    "keywords": [
+        "contao",
+        "bundle",
+        "SSO",
+        "adfs",
+        "BROCKHAUS AG"
+    ],
+    "type": "contao-bundle",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "BROCKHAUS AG",
+            "homepage": "https://github.com/BROCKHAUS-AG",
+            "role": "Company"
+        },
+        {
+            "name": "Niklas Lurse",
+            "homepage": "https://github.com/INoTime",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/BRCOKHAUS-AG/contao-microsoft-sso-bundle/issues",
+        "source": "https://github.com/BRCOKHAUS-AG/contao-microsoft-sso-bundle"
+    },
+    "require": {
+        "php": ">=7.1",
+        "contao/core-bundle": "^4.9",
+        "symfony/config": "^4.2 || ^5.1",
+        "symfony/dependency-injection": "^4.2 || ^5.1",
+        "symfony/http-kernel": "^4.2 || ^5.1",
+        "twig/twig": "^2.12 || ^3.0"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.3",
+        "symfony/http-client": "4.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "BrockhausAg\\ContaoMicrosoftSsoBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "BrockhausAg\\ContaoMicrosoftSsoBundle\\ContaoManager\\Plugin"
+    }
+}

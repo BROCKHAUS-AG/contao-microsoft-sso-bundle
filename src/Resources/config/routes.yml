@@ -1,0 +1,4 @@
+# config/routes.yml
+brockhaus_ag_contao_microsoft_sso.controller:
+    resource: ../../../src/Controller
+    type: annotation
