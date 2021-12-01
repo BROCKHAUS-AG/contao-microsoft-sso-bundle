@@ -57,6 +57,6 @@ class IOLogic {
 
     public function loadSAMLSettings() : array
     {
-        return $this->loadJsonFileAndDecode("/html/contao/settings.json");
+        return $this->loadJsonFileAndDecode("/html/contao/settings/settings.json");
     }
 }
