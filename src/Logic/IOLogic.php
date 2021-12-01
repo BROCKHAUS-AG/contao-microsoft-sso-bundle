@@ -51,12 +51,12 @@ class IOLogic {
 
     public function loadAuthConfig() : array
     {
-        $array = $this->loadJsonFileAndDecode(__DIR__ . "/../Resources/settings/config.json");
+        $array = $this->loadJsonFileAndDecode("/html/contao/settings/config.json");
         return array($array["oauth"], $array["group"]["id"]);
     }
 
     public function loadSAMLSettings() : array
     {
-        return $this->loadJsonFileAndDecode(__DIR__ . "/../Resources/settings/settings.json");
+        return $this->loadJsonFileAndDecode("/html/contao/settings.json");
     }
 }
