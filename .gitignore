@@ -1,3 +1,3 @@
 .idea/
-/src/Resources/config/settings/settings.json
-/src/Resources/config/settings/config.json
+/src/Resources/settings/settings.json
+/src/Resources/settings/config.json
