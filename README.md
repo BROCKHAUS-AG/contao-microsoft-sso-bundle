@@ -5,8 +5,8 @@
 Mit dem Contao Microsoft SSO Bundle der BROCKHAUS AG, können Sie sich ganz bequem per SSO im 
 Contao Backend anmelden.
 
-## Wie kann ich das Bundle installieren und Konfigurieren?
-1. Laden Sie sich das Bundle in Ihrer Contao Umgebung herunter
+## Wie kann ich das Bundle installieren und konfigurieren?
+1. Sie können das bundle über den Contao Manager oder auf der Konsole mit `composer require brockhaus-ag/contao-microsoft-sso-bundle` installieren
 2. Erstellen Sie unter "contao/" einen Ordner mit dem Namen "settings" 
 3. In unserem Bundle in dem Ordner "settings" finden Sie "example" Dateien. <b>Wichtig ist, 
    dass alle Dateien mit ".json" enden und nicht mit ".jsonc"!</b> 
