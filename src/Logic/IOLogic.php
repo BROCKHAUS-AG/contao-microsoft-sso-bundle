@@ -20,6 +20,8 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
+DEFINE("PATH", "/html/contao/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
+
 class IOLogic {
 
     private $logger;
@@ -51,12 +53,12 @@ class IOLogic {
 
     public function loadAuthConfig() : array
     {
-        $array = $this->loadJsonFileAndDecode("/html/contao/settings/config.json");
+        $array = $this->loadJsonFileAndDecode(PATH. "config.json");
         return array($array["oauth"], $array["group"]["id"]);
     }
 
     public function loadSAMLSettings() : array
     {
-        return $this->loadJsonFileAndDecode("/html/contao/settings/settings.json");
+        return $this->loadJsonFileAndDecode(PATH. "settings.json");
     }
 }
