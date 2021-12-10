@@ -8,7 +8,10 @@ Contao Backend anmelden.
 ## Wie kann ich das Bundle installieren und Konfigurieren?
 1. Laden Sie sich das Bundle in Ihrer Contao Umgebung herunter
 2. Erstellen Sie unter "contao/" einen Ordner mit dem Namen "settings" 
-3. In unserem Bundle in dem Ordner "settings" finden Sie "example" Dateien. <b>Wichtig ist, 
+3. In diesem Ordner soll sich ein weiterer Ordner mit dem Namen "brockhaus-ag" befinden.
+4. Anschließend erstellen Sie in dem Ordner "html/contao/settings/brockhaus-ag" einen weiteren Ordner mit 
+   dem Namen "contao-microsoft-sso-bundle".
+5. In unserem Bundle in dem Ordner "settings" finden Sie "example" Dateien. <b>Wichtig ist, 
    dass alle Dateien mit ".json" enden und nicht mit ".jsonc"!</b> 
    1. config.json 
       1. Diese Datei sorgt dafür, dass Sie all Ihre config-Variablen an einem Ort haben.
@@ -16,8 +19,8 @@ Contao Backend anmelden.
    2. settings.json
       1. In dieser Datei wird dafür gesorgt, dass alle SAML Settings in unserem Contao Bundle
          automatisch geladen werden.
-5. Wenn Sie diese Dateien angepasst haben, können Sie die Dateien in dem Ordner "contao/settings" 
-   ablegen.
+6. Wenn Sie diese Dateien angepasst haben, können Sie die Dateien in dem Ordner 
+   "html/contao/settings/brockhaus-ag/contao-microsoft-sso-bundle/" ablegen.
 
 ## Ich bin fertig, wie kann ich mich jetzt einloggen?
 1. Sie können sich automatisch per SSO einloggen, indem Sie in Ihrem Browser Ihre URL und dann 
