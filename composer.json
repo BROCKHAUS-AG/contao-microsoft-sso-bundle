@@ -25,8 +25,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/BRCOKHAUS-AG/contao-microsoft-sso-bundle/issues",
-        "source": "https://github.com/BRCOKHAUS-AG/contao-microsoft-sso-bundle"
+        "issues": "https://github.com/BROCKHAUS-AG/contao-microsoft-sso-bundle/issues",
+        "source": "https://github.com/BROCKHAUS-AG/contao-microsoft-sso-bundle"
     },
     "require": {
         "php": ">=7.1",
