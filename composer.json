@@ -34,7 +34,10 @@
         "symfony/config": "^4.2 || ^5.1",
         "symfony/dependency-injection": "^4.2 || ^5.1",
         "symfony/http-kernel": "^4.2 || ^5.1",
-        "twig/twig": "^2.12 || ^3.0"
+        "twig/twig": "^2.12 || ^3.0",
+        "ext-gd": "*",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.3",
