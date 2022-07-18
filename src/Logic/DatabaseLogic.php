@@ -6,7 +6,6 @@ declare(strict_types=1);
  * This file is part of Contao Microsoft SSO Bundle.
  *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
- * Author Niklas Lurse (INoTime) <nlurse@brockhaus-ag.de>
  *
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -84,6 +83,66 @@ class DatabaseLogic {
             ->from('tl_user')
             ->where('username =:username')
             ->setParameter('username', $username)
+            ->execute();
+    }
+
+    public function loadMemberByUsername($username)
+    {
+        return $this->databaseConnection->createQueryBuilder()
+            ->select('*')
+            ->from('tl_member')
+            ->where('username =:username')
+            ->setParameter('username', $username)
+            ->execute();
+    }
+
+    public function createMemberInContaoDatabase(string $passwordHash, string $firstname, string $lastname,
+                                                 string $username)
+    {
+        $this->databaseConnection->createQueryBuilder()
+            ->insert("tl_member")
+            ->values(
+                [
+                    "tstamp" => "?",
+                    "firstname" => "?",
+                    "lastname" => "?",
+                    "country" => "?",
+                    "email" => "?",
+                    "login" => "?",
+                    "username" => "?",
+                    "password" => "?"
+                ]
+            )
+            ->setParameters(
+                [
+                    0 => time(),
+                    1 => $firstname,
+                    2 => $lastname,
+                    3 => "de",
+                    4 => $username,
+                    5 => 1,
+                    6 => $username,
+                    7 => $passwordHash
+                ]
+            )->execute();
+    }
+
+    public function updateMemberInContaoDatabase(string $passwordHash, string $firstname, string $lastname,
+                                                 string $username)
+    {
+        $this->databaseConnection->createQueryBuilder()
+            ->update("tl_member")
+            ->set("firstname", ":firstname")
+            ->set("lastname", ":lastname")
+            ->set("email", ":email")
+            ->set("username", ":username")
+            ->set("password", ":password")
+            ->where("username =:username")
+            ->setParameter("firstname", $firstname)
+            ->setParameter("lastname", $lastname)
+            ->setParameter("email", $username)
+            ->setParameter("username", $username)
+            ->setParameter("password", $passwordHash)
             ->execute();
     }
 }

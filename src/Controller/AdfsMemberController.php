@@ -31,22 +31,22 @@ use Psr\Log\LoggerInterface;
 use BrockhausAg\ContaoMicrosoftSsoBundle\Logic\AdfsLogic;
 
 /**
- * Class AdfsController
+ * Class AdfsMemberController
  *
- * @Route("/adfs",
- *     name="brockhaus_ag_contao_microsoft_sso_adfs",
+ * @Route("/adfs_member",
+ *     name="brockhaus_ag_contao_microsoft_sso_adfs_member",
  *     defaults={
  *         "_scope" = "frontend",
  *         "_token_check" = true
  *     }
  * )
  */
-class AdfsController extends AbstractController
+class AdfsMemberController extends AbstractController
 {
     private $_adfs;
 
     /**
-     * AdfsController constructor.
+     * AdfsMemberController constructor.
      */
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -68,9 +68,10 @@ class AdfsController extends AbstractController
      */
     public function __invoke() : Response
     {
-        if (session_status() == PHP_SESSION_DISABLED) {
+        if (session_status() != PHP_SESSION_ACTIVE) {
             session_start();
-            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = Constants::USER_LOGIN;
+            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = Constants::MEMBER_LOGIN;
+            var_dump($_SESSION);
         }
         return $this->_adfs->generateResponse();
     }

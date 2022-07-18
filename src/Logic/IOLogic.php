@@ -6,7 +6,6 @@ declare(strict_types=1);
  * This file is part of Contao Microsoft SSO Bundle.
  *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
- * Author Niklas Lurse (INoTime) <nlurse@brockhaus-ag.de>
  *
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -20,15 +19,17 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-DEFINE("PATH", "/html/contao/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
+DEFINE("PATH", "/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
 
 class IOLogic {
 
     private $logger;
+    private $path;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, string $path)
     {
         $this->logger = $logger;
+        $this->path = $path;
     }
 
     private function checkIfFileExists(string $file)
@@ -53,12 +54,17 @@ class IOLogic {
 
     public function loadAuthConfig() : array
     {
-        $array = $this->loadJsonFileAndDecode(PATH. "config.json");
+        $array = $this->loadJsonFileAndDecode($this->getPath(). "config.json");
         return array($array["oauth"], $array["group"]["id"]);
     }
 
     public function loadSAMLSettings() : array
     {
-        return $this->loadJsonFileAndDecode(PATH. "settings.json");
+        return $this->loadJsonFileAndDecode($this->getPath(). "settings.json");
+    }
+
+    private function getPath(): string
+    {
+        return $this->path. PATH;
     }
 }

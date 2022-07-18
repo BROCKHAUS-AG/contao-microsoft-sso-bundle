@@ -8,6 +8,21 @@ services:
             - '@event_dispatcher'
             - '@logger'
             - '@request_stack'
+            - '%kernel.project_dir%'
+        public: true
+        calls:
+            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]
+
+    BrockhausAg\ContaoMicrosoftSsoBundle\Controller\AdfsMemberController:
+        arguments:
+            - '@contao.framework'
+            - '@security.token_storage'
+            - '@twig'
+            - '@database_connection'
+            - '@event_dispatcher'
+            - '@logger'
+            - '@request_stack'
+            - '%kernel.project_dir%'
         public: true
         calls:
             - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]

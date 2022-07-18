@@ -6,7 +6,6 @@ declare(strict_types=1);
  * This file is part of Contao Microsoft SSO Bundle.
  *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
- * Author Niklas Lurse (INoTime) <nlurse@brockhaus-ag.de>
  *
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -16,7 +15,9 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
+use BrockhausAg\ContaoMicrosoftSsoBundle\Constants;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,24 +42,27 @@ class AdfsLogic {
                                 Connection $databaseConnection,
                                 EventDispatcherInterface $dispatcher,
                                 LoggerInterface $logger,
-                                RequestStack $requestStack)
+                                RequestStack $requestStack,
+                                string $path)
     {
         $this->twig = $twig;
 
-        $this->_ioLogic = new IOLogic($logger);
+        $this->_ioLogic = new IOLogic($logger, $path);
         $this->_authenticationLogic = new AuthenticationLogic($framework, $tokenStorage, $twig, $databaseConnection,
             $dispatcher, $logger, $requestStack);
     }
 
     /**
      * Generate the response
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function generateResponse() : Response
     {
         require_once(__DIR__ . "/../Resources/_toolkit_loader.php");
         $this->deleteCookies();
-        $settings = $this->_ioLogic->loadSAMLSettings();
 
+        $settings = $this->_ioLogic->loadSAMLSettings();
         $auth = new Auth($settings);
 
         if (!empty($_POST)) {

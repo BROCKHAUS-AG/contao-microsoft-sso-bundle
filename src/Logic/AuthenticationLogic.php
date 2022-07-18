@@ -6,7 +6,6 @@ declare(strict_types=1);
  * This file is part of Contao Microsoft SSO Bundle.
  *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
- * Author Niklas Lurse (INoTime) <nlurse@brockhaus-ag.de>
  *
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
@@ -16,13 +15,12 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
+use BrockhausAg\ContaoMicrosoftSsoBundle\Constants;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Exception;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment as TwigEnvironment;
 use Doctrine\DBAL\Connection;
@@ -35,6 +33,7 @@ class AuthenticationLogic {
     private $_databaseLogic;
     private $_loginLogic;
     private $_httpLogic;
+    private $twig;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -47,6 +46,7 @@ class AuthenticationLogic {
         $this->_databaseLogic = new DatabaseLogic($databaseConnection);
         $this->_passwordLogic = new PasswordLogic();
         $this->_loginLogic = new LoginLogic($framework, $tokenStorage, $twig, $dispatcher, $logger, $requestStack);
+        $this->twig = $twig;
     }
 
     private function saveSAMLCredentialsToSession(Auth $auth)
@@ -77,10 +77,13 @@ class AuthenticationLogic {
         );
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     private function checkIfUserIsInDatabase(string $username) : bool
     {
         $statement = $this->_databaseLogic->loadUserByUsername($username);
-        return $statement->fetch(\PDO::FETCH_OBJ) != null;
+        return $statement->fetchAllAssociative() != null;
     }
 
     private function loadGroupMembers() : array
@@ -108,29 +111,46 @@ class AuthenticationLogic {
         }
     }
 
-    private function updateUserData($attributes) : string
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function updateUserData($userData): void
     {
-        $userData = $this->getUserData($attributes);
         $userIsInDatabase = $this->checkIfUserIsInDatabase($userData["username"]);
 
         $admin = $this->userIsInGroup($userData["username"]);
 
         $this->insertOrUpdateUser($userIsInDatabase, $userData, $admin);
-        return $userData["username"];
     }
 
-    private function checkForErrors(Auth $auth)
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function updateMemberData($userData): void
     {
-        $errors = $auth->getErrors();
+        $memberIsInDatabase = $this->checkIfMemberIsInDatabase($userData["username"]);
+        $this->insertOrUpdateMember($memberIsInDatabase, $userData);
+    }
 
-        if (!empty($errors)) {
-            echo '<p>', implode(', ', $errors), '</p>';
-            exit();
-        }
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    private function checkIfMemberIsInDatabase($username): bool
+    {
+        $statement = $this->_databaseLogic->loadMemberByUsername($username);
+        return count($statement->fetchAllAssociative()) != 0;
+    }
 
-        if (!$auth->isAuthenticated()) {
-            echo "<p>Not authenticated</p>";
-            exit();
+    private function insertOrUpdateMember(bool $memberIsInDatabase, $userData): void
+    {
+        $passwordHash = $this->_passwordLogic->newHashPassword();
+
+        if (!$memberIsInDatabase) {
+            $this->_databaseLogic->createMemberInContaoDatabase($passwordHash, $userData["firstname"],
+                $userData["lastname"], $userData["username"]);
+        }else {
+            $this->_databaseLogic->updateMemberInContaoDatabase($passwordHash, $userData["firstname"],
+                $userData["lastname"], $userData["username"]);
         }
     }
 
@@ -155,11 +175,13 @@ class AuthenticationLogic {
         unset($_SESSION['AuthNRequestID']);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
+     */
     public function authenticate(Auth $auth, array $oauthCredentials, string $groupId) : Response
     {
         $this->_httpLogic = new HttpLogic($oauthCredentials, $groupId);
-
-        session_start();
 
         $this->processSamlRequest($auth);
         $this->saveSAMLCredentialsToSession($auth);
@@ -167,10 +189,21 @@ class AuthenticationLogic {
         $email = $_SESSION['samlNameId'];
         echo '<h1>Identified user with SAML: ' . htmlentities($email) . '</h1>';
 
-        $username = $this->updateUserData($_SESSION['samlUserdata']);
+        $userData = $this->getUserData($_SESSION['samlUserdata']);
+        $this->updateUserData($userData);
+        $this->updateMemberData($userData);
 
-        $this->destroySession();
-
-        return $this->_loginLogic->loginUser($username);
+        try {
+            return $this->_loginLogic->login($userData["username"]);
+        } catch (Exception $e) {
+            return new Response($this->twig->render(
+                '@BrockhausAgContaoMicrosoftSso/LoginState/loginFailed.html.twig',
+                [
+                    'exception' => $e
+                ]
+            ));
+        } finally {
+            $this->destroySession();
+        }
     }
 }
