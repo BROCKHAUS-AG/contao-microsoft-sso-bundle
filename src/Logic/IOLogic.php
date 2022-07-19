@@ -15,11 +15,10 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
+use BrockhausAg\ContaoMicrosoftSsoBundle\Constants;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-
-DEFINE("PATH", "/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
 
 class IOLogic {
 
@@ -65,6 +64,6 @@ class IOLogic {
 
     private function getPath(): string
     {
-        return $this->_path. PATH;
+        return $this->_path. Constants::SETTINGS_PATH;
     }
 }
