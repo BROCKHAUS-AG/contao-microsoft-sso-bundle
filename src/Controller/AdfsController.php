@@ -68,10 +68,6 @@ class AdfsController extends AbstractController
      */
     public function __invoke() : Response
     {
-        if (session_status() == PHP_SESSION_DISABLED) {
-            session_start();
-            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = Constants::USER_LOGIN;
-        }
-        return $this->_adfs->generateResponse();
+        return $this->_adfs->generateResponse(Constants::USER_LOGIN);
     }
 }

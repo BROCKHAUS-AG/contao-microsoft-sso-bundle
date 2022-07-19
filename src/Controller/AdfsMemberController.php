@@ -68,11 +68,6 @@ class AdfsMemberController extends AbstractController
      */
     public function __invoke() : Response
     {
-        if (session_status() != PHP_SESSION_ACTIVE) {
-            session_start();
-            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = Constants::MEMBER_LOGIN;
-            var_dump($_SESSION);
-        }
-        return $this->_adfs->generateResponse();
+        return $this->_adfs->generateResponse(Constants::MEMBER_LOGIN);
     }
 }

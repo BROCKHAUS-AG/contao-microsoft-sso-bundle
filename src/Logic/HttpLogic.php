@@ -17,8 +17,8 @@ namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
 class HttpLogic {
 
-    private $oauthCredentials;
-    private $groupId;
+    private array $oauthCredentials;
+    private string $groupId;
 
     public function __construct(array $oauthCredentials, string $groupId) {
         $this->oauthCredentials = $oauthCredentials;

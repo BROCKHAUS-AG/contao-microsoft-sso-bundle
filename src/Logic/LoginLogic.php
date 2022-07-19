@@ -27,9 +27,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginLogic
 {
-    private $twig;
-    private $_userLoginLogic;
-    private $_memberLoginLogic;
+    private TwigEnvironment $twig;
+    private UserLoginLogic $_userLoginLogic;
+    private MemberLoginLogic $_memberLoginLogic;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -51,8 +51,8 @@ class LoginLogic
     public function login(string $username): Response
     {
         $loginType = $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME];
+        return $this->_userLoginLogic->login($username);
         if ($loginType == Constants::USER_LOGIN) {
-            return $this->_userLoginLogic->login($username);
         }else if ($loginType == Constants::MEMBER_LOGIN) {
             return $this->_memberLoginLogic->login($username);
         }

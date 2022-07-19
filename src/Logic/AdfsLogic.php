@@ -28,13 +28,11 @@ use OneLogin\Saml2\Auth;
 use Psr\Log\LoggerInterface;
 
 class AdfsLogic {
-    private $twig;
-
-    private $oauthCredentials;
-    private $groupId;
-
-    private $_ioLogic;
-    private $_authenticationLogic;
+    private TwigEnvironment $twig;
+    private IOLogic $_ioLogic;
+    private AuthenticationLogic $_authenticationLogic;
+    private array $oauthCredentials;
+    private string $groupId;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -57,7 +55,7 @@ class AdfsLogic {
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function generateResponse() : Response
+    public function generateResponse(string $loginType) : Response
     {
         require_once(__DIR__ . "/../Resources/_toolkit_loader.php");
         $this->deleteCookies();
@@ -67,7 +65,7 @@ class AdfsLogic {
 
         if (!empty($_POST)) {
             $this->loadAuthConfig();
-            return $this->_authenticationLogic->authenticate($auth, $this->oauthCredentials, $this->groupId);
+            return $this->_authenticationLogic->authenticate($auth, $this->oauthCredentials, $this->groupId, $loginType);
         }
 
         $auth->login();

@@ -15,12 +15,17 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
+use Exception;
+
 class PasswordLogic {
+    /**
+     * @throws Exception
+     */
     private function validateAndHashPassword(string $password) : string
     {
         $passwordLength = 8;
         if (strlen($password) < $passwordLength) {
-            throw new InvalidArgumentException(
+            throw new Exception(
                 sprintf('The password must be at least %s characters long.', $passwordLength)
             );
         }
@@ -38,6 +43,9 @@ class PasswordLogic {
         return $newPassword;
     }
 
+    /**
+     * @throws Exception
+     */
     public function newHashPassword() : string
     {
         $password = $this->randomPassword();

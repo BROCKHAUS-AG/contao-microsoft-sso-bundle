@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
 use BrockhausAg\ContaoMicrosoftSsoBundle\Constants;
+use BrockhausAg\ContaoMicrosoftSsoBundle\Model\User;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Exception;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -29,11 +30,11 @@ use OneLogin\Saml2\Auth;
 
 class AuthenticationLogic {
 
-    private $_passwordLogic;
-    private $_databaseLogic;
-    private $_loginLogic;
-    private $_httpLogic;
-    private $twig;
+    private PasswordLogic $_passwordLogic;
+    private DatabaseLogic $_databaseLogic;
+    private LoginLogic $_loginLogic;
+    private HttpLogic $_httpLogic;
+    private TwigEnvironment $twig;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -68,12 +69,12 @@ class AuthenticationLogic {
         return false;
     }
 
-    private function getUserData($attributes) : array
+    private function getUserData($attributes): User
     {
-        return array(
-            "username" => $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'][0],
-            "firstname" => $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'][0],
-            "lastname" => $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'][0]
+        return new User(
+            $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'][0],
+            $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'][0],
+            $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'][0]
         );
     }
 
@@ -99,37 +100,40 @@ class AuthenticationLogic {
         return $isInGroup ? 1 : 0;
     }
 
-    private function insertOrUpdateUser(bool $result, array $userData, int $admin) {
+    /**
+     * @throws Exception
+     */
+    private function insertOrUpdateUser(bool $result, User $user, int $admin) {
         $passwordHash = $this->_passwordLogic->newHashPassword();
 
         if (!$result) {
-            $this->_databaseLogic->createUserInContaoDatabase($passwordHash, $userData["firstname"],
-                $userData["lastname"], $userData["username"], $admin);
+            $this->_databaseLogic->createUserInContaoDatabase($passwordHash, $user, $admin);
         }else {
-            $this->_databaseLogic->updateUserInContaoDatabase($passwordHash, $userData["firstname"],
-                $userData["lastname"], $userData["username"], $admin);
+            $this->_databaseLogic->updateUserInContaoDatabase($passwordHash, $user, $admin);
         }
     }
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
      */
-    private function updateUserData($userData): void
+    private function updateUserData(User $user): void
     {
-        $userIsInDatabase = $this->checkIfUserIsInDatabase($userData["username"]);
+        $userIsInDatabase = $this->checkIfUserIsInDatabase($user->getUsername());
 
-        $admin = $this->userIsInGroup($userData["username"]);
+        $admin = $this->userIsInGroup($user->getUsername());
 
-        $this->insertOrUpdateUser($userIsInDatabase, $userData, $admin);
+        $this->insertOrUpdateUser($userIsInDatabase, $user, $admin);
     }
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
      */
-    private function updateMemberData($userData): void
+    private function updateMemberData(User $user): void
     {
-        $memberIsInDatabase = $this->checkIfMemberIsInDatabase($userData["username"]);
-        $this->insertOrUpdateMember($memberIsInDatabase, $userData);
+        $memberIsInDatabase = $this->checkIfMemberIsInDatabase($user->getUsername());
+        $this->insertOrUpdateMember($memberIsInDatabase, $user);
     }
 
     /**
@@ -141,23 +145,31 @@ class AuthenticationLogic {
         return count($statement->fetchAllAssociative()) != 0;
     }
 
-    private function insertOrUpdateMember(bool $memberIsInDatabase, $userData): void
+    /**
+     * @throws Exception
+     */
+    private function insertOrUpdateMember(bool $memberIsInDatabase, User $user): void
     {
         $passwordHash = $this->_passwordLogic->newHashPassword();
 
         if (!$memberIsInDatabase) {
-            $this->_databaseLogic->createMemberInContaoDatabase($passwordHash, $userData["firstname"],
-                $userData["lastname"], $userData["username"]);
+            $this->_databaseLogic->createMemberInContaoDatabase($passwordHash, $user);
         }else {
-            $this->_databaseLogic->updateMemberInContaoDatabase($passwordHash, $userData["firstname"],
-                $userData["lastname"], $userData["username"]);
+            $this->_databaseLogic->updateMemberInContaoDatabase($passwordHash, $user);
         }
     }
 
-    private function destroySession()
+    private function destroySession(): void
     {
         $_SESSION = [];
         session_destroy();
+    }
+
+    private function startSession(): void
+    {
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            session_start();
+        }
     }
 
     private function getAuthNRequestID() : ?string
@@ -179,9 +191,15 @@ class AuthenticationLogic {
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    public function authenticate(Auth $auth, array $oauthCredentials, string $groupId) : Response
+    public function authenticate(Auth $auth, array $oauthCredentials, string $groupId, string $loginType) : Response
     {
         $this->_httpLogic = new HttpLogic($oauthCredentials, $groupId);
+
+        $this->startSession();
+
+        if (!isset($_SESSION[Constants::LOGIN_TYPE_SESSION_NAME])) {
+            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = $loginType;
+        }
 
         $this->processSamlRequest($auth);
         $this->saveSAMLCredentialsToSession($auth);
@@ -189,18 +207,16 @@ class AuthenticationLogic {
         $email = $_SESSION['samlNameId'];
         echo '<h1>Identified user with SAML: ' . htmlentities($email) . '</h1>';
 
-        $userData = $this->getUserData($_SESSION['samlUserdata']);
-        $this->updateUserData($userData);
-        $this->updateMemberData($userData);
+        $user = $this->getUserData($_SESSION['samlUserdata']);
+        $this->updateUserData($user);
+        $this->updateMemberData($user);
 
         try {
-            return $this->_loginLogic->login($userData["username"]);
+            return $this->_loginLogic->login($user->getUsername());
         } catch (Exception $e) {
             return new Response($this->twig->render(
                 '@BrockhausAgContaoMicrosoftSso/LoginState/loginFailed.html.twig',
-                [
-                    'exception' => $e
-                ]
+                [ 'exception' => $e ]
             ));
         } finally {
             $this->destroySession();

@@ -24,7 +24,7 @@
         "source": "https://github.com/BRCOKHAUS-AG/contao-microsoft-sso-bundle"
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.4",
         "contao/core-bundle": "^4.9",
         "symfony/config": "^4.2 || ^5.1",
         "symfony/dependency-injection": "^4.2 || ^5.1",

@@ -23,8 +23,8 @@ DEFINE("PATH", "/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
 
 class IOLogic {
 
-    private $logger;
-    private $path;
+    private LoggerInterface $logger;
+    private string $path;
 
     public function __construct(LoggerInterface $logger, string $path)
     {

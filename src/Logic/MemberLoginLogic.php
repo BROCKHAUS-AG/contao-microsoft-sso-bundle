@@ -34,13 +34,13 @@ use Twig\Environment as TwigEnvironment;
 
 class MemberLoginLogic
 {
-    private $framework;
-    private $tokenStorage;
-    private $twig;
-    private $dispatcher;
-    private $logger;
-    private $requestStack;
-    private $failureLogic;
+    private ContaoFramework $framework;
+    private TokenStorageInterface $tokenStorage;
+    private TwigEnvironment $twig;
+    private EventDispatcherInterface $dispatcher;
+    private LoggerInterface $logger;
+    private RequestStack $requestStack;
+    private FailureLogic $failureLogic;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,

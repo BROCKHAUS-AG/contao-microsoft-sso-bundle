@@ -15,17 +15,17 @@ declare(strict_types=1);
 
 namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
+use BrockhausAg\ContaoMicrosoftSsoBundle\Model\User;
 use Doctrine\DBAL\Connection;
 
 class DatabaseLogic {
-    private $databaseConnection;
+    private Connection $databaseConnection;
 
     public function __construct(Connection $databaseConnection) {
         $this->databaseConnection = $databaseConnection;
     }
 
-    public function updateUserInContaoDatabase(string $hash, string $firstname, string $lastname,
-                                                string $username, int $admin) : void {
+    public function updateUserInContaoDatabase(string $hash, User $user, int $admin) : void {
         $this->databaseConnection->createQueryBuilder()
             ->update("tl_user")
             ->set("password", ":password")
@@ -36,17 +36,16 @@ class DatabaseLogic {
             ->set("et_enable", ":et_enable")
             ->where("username =:username")
             ->setParameter("password", $hash)
-            ->setParameter("name", $firstname. " ". $lastname)
+            ->setParameter("name", $user->getFirstname(). " ". $user->getLastname())
             ->setParameter("language", "de")
-            ->setParameter("email", $username)
+            ->setParameter("email", $user->getUsername())
             ->setParameter("admin", $admin)
             ->setParameter("et_enable", 1)
-            ->setParameter("username", $username)
+            ->setParameter("username", $user->getUsername())
             ->execute();
     }
 
-    public function createUserInContaoDatabase(string $hash, string $firstname, string $lastname,
-                                                string $username, int $admin) : void {
+    public function createUserInContaoDatabase(string $hash, User $user, int $admin) : void {
         $this->databaseConnection->createQueryBuilder()
             ->insert("tl_user")
             ->values(
@@ -65,12 +64,12 @@ class DatabaseLogic {
                 [
                     0 => time(),
                     1 => $hash,
-                    2 => $firstname. " ". $lastname,
+                    2 => $user->getFirstname(). " ". $user->getLastname(),
                     3 => "de",
-                    4 => $username,
+                    4 => $user->getUsername(),
                     5 => $admin,
                     6 => 1,
-                    7 => $username
+                    7 => $user->getUsername()
                 ]
             )
             ->execute();
@@ -96,8 +95,7 @@ class DatabaseLogic {
             ->execute();
     }
 
-    public function createMemberInContaoDatabase(string $passwordHash, string $firstname, string $lastname,
-                                                 string $username)
+    public function createMemberInContaoDatabase(string $passwordHash, User $user)
     {
         $this->databaseConnection->createQueryBuilder()
             ->insert("tl_member")
@@ -116,19 +114,18 @@ class DatabaseLogic {
             ->setParameters(
                 [
                     0 => time(),
-                    1 => $firstname,
-                    2 => $lastname,
+                    1 => $user->getFirstname(),
+                    2 => $user->getLastname(),
                     3 => "de",
-                    4 => $username,
+                    4 => $user->getUsername(),
                     5 => 1,
-                    6 => $username,
+                    6 => $user->getUsername(),
                     7 => $passwordHash
                 ]
             )->execute();
     }
 
-    public function updateMemberInContaoDatabase(string $passwordHash, string $firstname, string $lastname,
-                                                 string $username)
+    public function updateMemberInContaoDatabase(string $passwordHash, User $user)
     {
         $this->databaseConnection->createQueryBuilder()
             ->update("tl_member")
@@ -138,10 +135,10 @@ class DatabaseLogic {
             ->set("username", ":username")
             ->set("password", ":password")
             ->where("username =:username")
-            ->setParameter("firstname", $firstname)
-            ->setParameter("lastname", $lastname)
-            ->setParameter("email", $username)
-            ->setParameter("username", $username)
+            ->setParameter("firstname", $user->getUsername())
+            ->setParameter("lastname", $user->getLastname())
+            ->setParameter("email", $user->getUsername())
+            ->setParameter("username", $user->getUsername())
             ->setParameter("password", $passwordHash)
             ->execute();
     }

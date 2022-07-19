@@ -25,8 +25,8 @@ use Twig\Environment as TwigEnvironment;
 
 class FailureLogic
 {
-    private $twig;
-    private $logger;
+    private TwigEnvironment $twig;
+    private LoggerInterface $logger;
 
     public function __construct(TwigEnvironment $twig, LoggerInterface $logger)
     {
