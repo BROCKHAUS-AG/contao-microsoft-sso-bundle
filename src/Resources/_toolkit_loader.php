@@ -5,7 +5,6 @@ declare(strict_types=1);
  * This file is part of Contao Microsoft SSO Bundle.
  *
  * (c) BROCKHAUS AG 2021 <info@brockhaus-ag.de>
- * Author Niklas Lurse (INoTime) <nlurse@brockhaus-ag.de>
  *
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
