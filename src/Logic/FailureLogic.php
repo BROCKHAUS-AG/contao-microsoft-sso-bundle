@@ -25,13 +25,13 @@ use Twig\Environment as TwigEnvironment;
 
 class FailureLogic
 {
-    private TwigEnvironment $twig;
-    private LoggerInterface $logger;
+    private TwigEnvironment $_twig;
+    private LoggerInterface $_logger;
 
     public function __construct(TwigEnvironment $twig, LoggerInterface $logger)
     {
-        $this->twig = $twig;
-        $this->logger = $logger;
+        $this->_twig = $twig;
+        $this->_logger = $logger;
     }
 
     /**
@@ -39,13 +39,13 @@ class FailureLogic
      */
     public function usernameNotFound(string $username, UsernameNotFoundException $exception) : Response
     {
-        $this->logger->log(
+        $this->_logger->log(
             LogLevel::WARNING,
             'Username "'. $username. '" not found for auto login',
             ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
         );
 
-        return new Response($this->twig->render(
+        return new Response($this->_twig->render(
             '@BrockhausAgContaoMicrosoftSso/LoginState/loginFailed.html.twig',
             [
                 'exception' => "User provider: ". $exception

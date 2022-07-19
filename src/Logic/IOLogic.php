@@ -23,20 +23,20 @@ DEFINE("PATH", "/settings/brockhaus-ag/contao-microsoft-sso-bundle/");
 
 class IOLogic {
 
-    private LoggerInterface $logger;
-    private string $path;
+    private LoggerInterface $_logger;
+    private string $_path;
 
     public function __construct(LoggerInterface $logger, string $path)
     {
-        $this->logger = $logger;
-        $this->path = $path;
+        $this->_logger = $logger;
+        $this->_path = $path;
     }
 
     private function checkIfFileExists(string $file)
     {
         if (!file_exists($file)) {
             $errorMessage = 'File: "'. $file. " could not be found. Please create it!";
-            $this->logger->log(
+            $this->_logger->log(
                 LogLevel::WARNING, $errorMessage,
                 ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
             );
@@ -65,6 +65,6 @@ class IOLogic {
 
     private function getPath(): string
     {
-        return $this->path. PATH;
+        return $this->_path. PATH;
     }
 }

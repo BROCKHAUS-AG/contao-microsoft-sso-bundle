@@ -17,12 +17,12 @@ namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
 class HttpLogic {
 
-    private array $oauthCredentials;
-    private string $groupId;
+    private array $_oauthCredentials;
+    private string $_groupId;
 
     public function __construct(array $oauthCredentials, string $groupId) {
-        $this->oauthCredentials = $oauthCredentials;
-        $this->groupId = $groupId;
+        $this->_oauthCredentials = $oauthCredentials;
+        $this->_groupId = $groupId;
     }
 
     private function createHttpPostRequest($curl, array $headers, array $postParams) {
@@ -67,12 +67,12 @@ class HttpLogic {
     }
 
     public function getAccessToken() : string {
-        $oauthURL = "https://" . $this->oauthCredentials["hostname"]. "/". $this->oauthCredentials["postUrl"];
+        $oauthURL = "https://" . $this->_oauthCredentials["hostname"]. "/". $this->_oauthCredentials["postUrl"];
 
         $headers = $this->createHeaderForTokenRequest(
-            $this->oauthCredentials["postUrl"], $this->oauthCredentials["hostname"]);
+            $this->_oauthCredentials["postUrl"], $this->_oauthCredentials["hostname"]);
         $post_params = $this->createBodyForTokenRequest(
-            $this->oauthCredentials["clientId"], $this->oauthCredentials["clientSecret"]);
+            $this->_oauthCredentials["clientId"], $this->_oauthCredentials["clientSecret"]);
         $jsonResponse = $this->makeRequestForToken($oauthURL, $headers, $post_params);
 
         return $this->getAccessTokenFromJsonResponse($jsonResponse);
@@ -102,7 +102,7 @@ class HttpLogic {
 
     public function getGroupMembersWithAccessToken(string $accessToken) : array
     {
-        $groupUrl = "https://graph.microsoft.com/v1.0/groups/". $this->groupId. "/members";
+        $groupUrl = "https://graph.microsoft.com/v1.0/groups/". $this->_groupId. "/members";
         $response = $this->createRequestForGroup($groupUrl, $accessToken);
         return $this->getMembersFromGroupResponse($response);
     }

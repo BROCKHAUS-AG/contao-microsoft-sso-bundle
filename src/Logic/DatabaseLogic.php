@@ -19,14 +19,14 @@ use BrockhausAg\ContaoMicrosoftSsoBundle\Model\User;
 use Doctrine\DBAL\Connection;
 
 class DatabaseLogic {
-    private Connection $databaseConnection;
+    private Connection $_databaseConnection;
 
     public function __construct(Connection $databaseConnection) {
-        $this->databaseConnection = $databaseConnection;
+        $this->_databaseConnection = $databaseConnection;
     }
 
     public function updateUserInContaoDatabase(string $hash, User $user, int $admin) : void {
-        $this->databaseConnection->createQueryBuilder()
+        $this->_databaseConnection->createQueryBuilder()
             ->update("tl_user")
             ->set("password", ":password")
             ->set("name", ":name")
@@ -46,7 +46,7 @@ class DatabaseLogic {
     }
 
     public function createUserInContaoDatabase(string $hash, User $user, int $admin) : void {
-        $this->databaseConnection->createQueryBuilder()
+        $this->_databaseConnection->createQueryBuilder()
             ->insert("tl_user")
             ->values(
                 [
@@ -77,7 +77,7 @@ class DatabaseLogic {
 
     public function loadUserByUsername(string $username)
     {
-        return $this->databaseConnection->createQueryBuilder()
+        return $this->_databaseConnection->createQueryBuilder()
             ->select('*')
             ->from('tl_user')
             ->where('username =:username')
@@ -87,7 +87,7 @@ class DatabaseLogic {
 
     public function loadMemberByUsername($username)
     {
-        return $this->databaseConnection->createQueryBuilder()
+        return $this->_databaseConnection->createQueryBuilder()
             ->select('*')
             ->from('tl_member')
             ->where('username =:username')
@@ -97,7 +97,7 @@ class DatabaseLogic {
 
     public function createMemberInContaoDatabase(string $passwordHash, User $user)
     {
-        $this->databaseConnection->createQueryBuilder()
+        $this->_databaseConnection->createQueryBuilder()
             ->insert("tl_member")
             ->values(
                 [
@@ -127,7 +127,7 @@ class DatabaseLogic {
 
     public function updateMemberInContaoDatabase(string $passwordHash, User $user)
     {
-        $this->databaseConnection->createQueryBuilder()
+        $this->_databaseConnection->createQueryBuilder()
             ->update("tl_member")
             ->set("firstname", ":firstname")
             ->set("lastname", ":lastname")

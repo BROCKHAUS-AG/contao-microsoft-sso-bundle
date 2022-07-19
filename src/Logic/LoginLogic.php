@@ -27,22 +27,30 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginLogic
 {
-    private TwigEnvironment $twig;
+    private TwigEnvironment $_twig;
     private UserLoginLogic $_userLoginLogic;
     private MemberLoginLogic $_memberLoginLogic;
+    private string $_path;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
                                 TwigEnvironment $twig,
                                 EventDispatcherInterface $dispatcher,
                                 LoggerInterface $logger,
-                                RequestStack $requestStack)
+                                RequestStack $requestStack,
+                                string $path)
     {
-        $this->twig = $twig;
+        $this->_twig = $twig;
+        $this->_path = $path;
         $this->_userLoginLogic = new UserLoginLogic($framework, $tokenStorage, $twig, $dispatcher, $logger,
            $requestStack);
         $this->_memberLoginLogic = new MemberLoginLogic($framework, $tokenStorage, $twig, $dispatcher, $logger,
             $requestStack);
+    }
+
+    private function getLoginTypeFromFile(): string
+    {
+        return file_get_contents($this->_path. Constants::LOGIN_TYPE_FILE);
     }
 
     /**
@@ -50,14 +58,14 @@ class LoginLogic
      */
     public function login(string $username): Response
     {
-        $loginType = $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME];
-        return $this->_userLoginLogic->login($username);
+        $loginType = $this->getLoginTypeFromFile();
         if ($loginType == Constants::USER_LOGIN) {
+            return $this->_userLoginLogic->login($username);
         }else if ($loginType == Constants::MEMBER_LOGIN) {
             return $this->_memberLoginLogic->login($username);
         }
 
-        return new Response($this->twig->render(
+        return new Response($this->_twig->render(
             '@BrockhausAgContaoMicrosoftSso/LoginState/loginFailed.html.twig',
             [
                 'exception' => "\"$loginType\" is an invalid login type."

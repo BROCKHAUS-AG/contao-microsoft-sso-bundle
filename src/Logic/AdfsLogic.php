@@ -28,11 +28,13 @@ use OneLogin\Saml2\Auth;
 use Psr\Log\LoggerInterface;
 
 class AdfsLogic {
-    private TwigEnvironment $twig;
+    private TwigEnvironment $_twig;
     private IOLogic $_ioLogic;
     private AuthenticationLogic $_authenticationLogic;
+
     private array $oauthCredentials;
     private string $groupId;
+    private string $_path;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -43,12 +45,29 @@ class AdfsLogic {
                                 RequestStack $requestStack,
                                 string $path)
     {
-        $this->twig = $twig;
+        $this->_twig = $twig;
+        $this->_path = $path;
 
         $this->_ioLogic = new IOLogic($logger, $path);
         $this->_authenticationLogic = new AuthenticationLogic($framework, $tokenStorage, $twig, $databaseConnection,
-            $dispatcher, $logger, $requestStack);
+            $dispatcher, $logger, $requestStack, $path);
     }
+
+    /**
+     * @throws Exception
+     */
+    private function createLoginTypeFile(string $file, string $loginType): void
+    {
+        if (!file_exists($file)) {
+            file_put_contents($file, $loginType);
+        }
+    }
+
+    private function deleteLoginTypeFile(string $file): void
+    {
+        unlink($file);
+    }
+
 
     /**
      * Generate the response
@@ -57,6 +76,9 @@ class AdfsLogic {
      */
     public function generateResponse(string $loginType) : Response
     {
+        $file = $this->_path. Constants::LOGIN_TYPE_FILE;
+        $this->createLoginTypeFile($file, $loginType);
+
         require_once(__DIR__ . "/../Resources/_toolkit_loader.php");
         $this->deleteCookies();
 
@@ -65,11 +87,13 @@ class AdfsLogic {
 
         if (!empty($_POST)) {
             $this->loadAuthConfig();
-            return $this->_authenticationLogic->authenticate($auth, $this->oauthCredentials, $this->groupId, $loginType);
+            $result = $this->_authenticationLogic->authenticate($auth, $this->oauthCredentials, $this->groupId);
+            $this->deleteLoginTypeFile($file);
+            return $result;
         }
 
         $auth->login();
-        return new Response($this->twig->render(
+        return new Response($this->_twig->render(
             '@BrockhausAgContaoMicrosoftSso/Adfs/adfs.html.twig', []
         ));
     }

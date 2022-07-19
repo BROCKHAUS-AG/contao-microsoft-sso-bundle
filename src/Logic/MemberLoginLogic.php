@@ -34,13 +34,13 @@ use Twig\Environment as TwigEnvironment;
 
 class MemberLoginLogic
 {
-    private ContaoFramework $framework;
-    private TokenStorageInterface $tokenStorage;
-    private TwigEnvironment $twig;
-    private EventDispatcherInterface $dispatcher;
-    private LoggerInterface $logger;
-    private RequestStack $requestStack;
-    private FailureLogic $failureLogic;
+    private ContaoFramework $_framework;
+    private TokenStorageInterface $_tokenStorage;
+    private TwigEnvironment $_twig;
+    private EventDispatcherInterface $_dispatcher;
+    private LoggerInterface $_logger;
+    private RequestStack $_requestStack;
+    private FailureLogic $_failureLogic;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -49,19 +49,19 @@ class MemberLoginLogic
                                 LoggerInterface $logger,
                                 RequestStack $requestStack)
     {
-        $this->framework = $framework;
-        $this->tokenStorage = $tokenStorage;
-        $this->twig = $twig;
-        $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
-        $this->requestStack = $requestStack;
-        $this->failureLogic = new FailureLogic($twig, $logger);
+        $this->_framework = $framework;
+        $this->_tokenStorage = $tokenStorage;
+        $this->_twig = $twig;
+        $this->_dispatcher = $dispatcher;
+        $this->_logger = $logger;
+        $this->_requestStack = $requestStack;
+        $this->_failureLogic = new FailureLogic($twig, $logger);
     }
 
     private function getToken($user) : UsernamePasswordToken
     {
         $token = new UsernamePasswordToken($user, null, "frontend", $user->getRoles());
-        $this->tokenStorage->setToken($token);
+        $this->_tokenStorage->setToken($token);
         return $token;
     }
 
@@ -73,8 +73,8 @@ class MemberLoginLogic
 
     private function toggleLoginEvent(UsernamePasswordToken $token)
     {
-        $event = new InteractiveLoginEvent($this->requestStack->getCurrentRequest(), $token);
-        $this->dispatcher->dispatch($event, 'security.interactive_login');
+        $event = new InteractiveLoginEvent($this->_requestStack->getCurrentRequest(), $token);
+        $this->_dispatcher->dispatch($event, 'security.interactive_login');
     }
 
     /**
@@ -82,13 +82,13 @@ class MemberLoginLogic
      */
     private function userWasSuccessfullyLoggedIn(string $username) : Response
     {
-        $this->logger->log(
+        $this->_logger->log(
             LogLevel::INFO,
             'User "'. $username. '" was logged in automatically',
             ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
         );
 
-        return new Response($this->twig->render(
+        return new Response($this->_twig->render(
             '@BrockhausAgContaoMicrosoftSso/LoginState/loginMemberSuccess.html.twig', []
         ));
     }
@@ -98,13 +98,13 @@ class MemberLoginLogic
      */
     public function login(string $username): Response
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-        $userProvider = new ContaoUserProvider($this->framework, $session, FrontendUser::class, $this->logger);
+        $session = $this->_requestStack->getCurrentRequest()->getSession();
+        $userProvider = new ContaoUserProvider($this->_framework, $session, FrontendUser::class, $this->_logger);
 
         try {
             $user = $userProvider->loadUserByUsername($username);
         } catch (UsernameNotFoundException $exception) {
-            return $this->failureLogic->usernameNotFound($username, $exception);
+            return $this->_failureLogic->usernameNotFound($username, $exception);
         }
 
         $token = $this->getToken($user);

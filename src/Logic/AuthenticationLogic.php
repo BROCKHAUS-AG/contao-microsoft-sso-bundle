@@ -34,7 +34,7 @@ class AuthenticationLogic {
     private DatabaseLogic $_databaseLogic;
     private LoginLogic $_loginLogic;
     private HttpLogic $_httpLogic;
-    private TwigEnvironment $twig;
+    private TwigEnvironment $_twig;
 
     public function __construct(ContaoFramework $framework,
                                 TokenStorageInterface $tokenStorage,
@@ -42,12 +42,14 @@ class AuthenticationLogic {
                                 Connection $databaseConnection,
                                 EventDispatcherInterface $dispatcher,
                                 LoggerInterface $logger,
-                                RequestStack $requestStack)
+                                RequestStack $requestStack,
+                                string $path)
     {
         $this->_databaseLogic = new DatabaseLogic($databaseConnection);
         $this->_passwordLogic = new PasswordLogic();
-        $this->_loginLogic = new LoginLogic($framework, $tokenStorage, $twig, $dispatcher, $logger, $requestStack);
-        $this->twig = $twig;
+        $this->_loginLogic = new LoginLogic($framework, $tokenStorage, $twig, $dispatcher, $logger, $requestStack,
+            $path);
+        $this->_twig = $twig;
     }
 
     private function saveSAMLCredentialsToSession(Auth $auth)
@@ -69,7 +71,7 @@ class AuthenticationLogic {
         return false;
     }
 
-    private function getUserData($attributes): User
+    private function getUser($attributes): User
     {
         return new User(
             $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'][0],
@@ -139,6 +141,17 @@ class AuthenticationLogic {
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
      */
+    private function getUserAndUpdate(): User
+    {
+        $user = $this->getUser($_SESSION['samlUserdata']);
+        $this->updateUserData($user);
+        $this->updateMemberData($user);
+        return $user;
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     private function checkIfMemberIsInDatabase($username): bool
     {
         $statement = $this->_databaseLogic->loadMemberByUsername($username);
@@ -187,34 +200,36 @@ class AuthenticationLogic {
         unset($_SESSION['AuthNRequestID']);
     }
 
+    private function processSamlRequestAndSaveCredentials(Auth $auth): void
+    {
+        $this->processSamlRequest($auth);
+        $this->saveSAMLCredentialsToSession($auth);
+    }
+
+    private function displayUserSuccessfullyIdentified(): void
+    {
+        $email = $_SESSION['samlNameId'];
+        echo '<h1>Identified user with SAML: ' . htmlentities($email) . '</h1>';
+    }
+
+
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
      */
-    public function authenticate(Auth $auth, array $oauthCredentials, string $groupId, string $loginType) : Response
+    public function authenticate(Auth $auth, array $oauthCredentials, string $groupId) : Response
     {
         $this->_httpLogic = new HttpLogic($oauthCredentials, $groupId);
-
         $this->startSession();
 
-        if (!isset($_SESSION[Constants::LOGIN_TYPE_SESSION_NAME])) {
-            $_SESSION[Constants::LOGIN_TYPE_SESSION_NAME] = $loginType;
-        }
-
-        $this->processSamlRequest($auth);
-        $this->saveSAMLCredentialsToSession($auth);
-
-        $email = $_SESSION['samlNameId'];
-        echo '<h1>Identified user with SAML: ' . htmlentities($email) . '</h1>';
-
-        $user = $this->getUserData($_SESSION['samlUserdata']);
-        $this->updateUserData($user);
-        $this->updateMemberData($user);
+        $this->processSamlRequestAndSaveCredentials($auth);
+        $this->displayUserSuccessfullyIdentified();
+        $user = $this->getUserAndUpdate();
 
         try {
             return $this->_loginLogic->login($user->getUsername());
         } catch (Exception $e) {
-            return new Response($this->twig->render(
+            return new Response($this->_twig->render(
                 '@BrockhausAgContaoMicrosoftSso/LoginState/loginFailed.html.twig',
                 [ 'exception' => $e ]
             ));

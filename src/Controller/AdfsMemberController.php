@@ -43,7 +43,7 @@ use BrockhausAg\ContaoMicrosoftSsoBundle\Logic\AdfsLogic;
  */
 class AdfsMemberController extends AbstractController
 {
-    private $_adfs;
+    private AdfsLogic $_adfs;
 
     /**
      * AdfsMemberController constructor.
