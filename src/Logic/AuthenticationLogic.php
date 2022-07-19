@@ -82,6 +82,7 @@ class AuthenticationLogic {
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     private function checkIfUserIsInDatabase(string $username) : bool
     {
@@ -151,6 +152,7 @@ class AuthenticationLogic {
 
     /**
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     private function checkIfMemberIsInDatabase($username): bool
     {

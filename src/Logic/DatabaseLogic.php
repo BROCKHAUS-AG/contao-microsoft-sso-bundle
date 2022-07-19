@@ -17,6 +17,7 @@ namespace BrockhausAg\ContaoMicrosoftSsoBundle\Logic;
 
 use BrockhausAg\ContaoMicrosoftSsoBundle\Model\User;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 
 class DatabaseLogic {
     private Connection $_databaseConnection;
@@ -25,6 +26,9 @@ class DatabaseLogic {
         $this->_databaseConnection = $databaseConnection;
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateUserInContaoDatabase(string $hash, User $user, int $admin) : void {
         $this->_databaseConnection->createQueryBuilder()
             ->update("tl_user")
@@ -45,6 +49,9 @@ class DatabaseLogic {
             ->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function createUserInContaoDatabase(string $hash, User $user, int $admin) : void {
         $this->_databaseConnection->createQueryBuilder()
             ->insert("tl_user")
@@ -75,6 +82,9 @@ class DatabaseLogic {
             ->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function loadUserByUsername(string $username)
     {
         return $this->_databaseConnection->createQueryBuilder()
@@ -85,6 +95,9 @@ class DatabaseLogic {
             ->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function loadMemberByUsername($username)
     {
         return $this->_databaseConnection->createQueryBuilder()
@@ -95,6 +108,9 @@ class DatabaseLogic {
             ->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function createMemberInContaoDatabase(string $passwordHash, User $user)
     {
         $this->_databaseConnection->createQueryBuilder()
@@ -125,6 +141,9 @@ class DatabaseLogic {
             )->execute();
     }
 
+    /**
+     * @throws Exception
+     */
     public function updateMemberInContaoDatabase(string $passwordHash, User $user)
     {
         $this->_databaseConnection->createQueryBuilder()
