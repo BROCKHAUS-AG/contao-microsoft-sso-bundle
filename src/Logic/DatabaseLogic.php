@@ -135,7 +135,7 @@ class DatabaseLogic {
             ->set("username", ":username")
             ->set("password", ":password")
             ->where("username =:username")
-            ->setParameter("firstname", $user->getUsername())
+            ->setParameter("firstname", $user->getFirstname())
             ->setParameter("lastname", $user->getLastname())
             ->setParameter("email", $user->getUsername())
             ->setParameter("username", $user->getUsername())
