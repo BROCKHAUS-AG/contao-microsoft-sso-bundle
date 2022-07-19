@@ -31,12 +31,15 @@ haben wir alles zusammengefasst.
 
 ## **Ich bin fertig, wie kann ich mich jetzt einloggen?**
 1. Sie können sich automatisch per SSO einloggen, indem Sie in Ihrem Browser Ihre URL mit dem Zusatz 
-   &quot;/adfs&quot; eingeben.
+   &quot;/adfs&quot; eingeben. Außerdem können Sie sich auch mit dem URL-Zusatz &quot;/adfs_member&quot; 
+   im Contao frontend anmelden. Sie müssen das Mitglied später dementsprechend den unterschiedlichen 
+   Mitgliedergruppen zuweisen.
 2. Sie sollten nun automatisch eingeloggt sein!
 
 ## **Wie funktioniert das?**
-Über den Controller &quot;/adfs&quot; werden unterschiedliche Schnittstellen aufgerufen, die für ein 
-automatisches Einloggen sorgen. Doch welche Schnittstellen sind das und wie funktioniert das?</br>
+Über den Controller &quot;/adfs&quot; und &quot;/adfs_member&quot; werden unterschiedliche Schnittstellen 
+aufgerufen, die für ein automatisches Einloggen sorgen. Doch welche Schnittstellen sind das und wie 
+funktioniert das?</br>
 </br>
 Sobald Sie auf die Seite zugreifen, wird mithilfe Ihrer SAML Settings ein SAML Request abgesetzt. Dieser 
 leitet Sie zu der von Ihnen angegebenen IDP weiter. Sobald Sie sich per SSO erfolgreich angemeldet haben, 
@@ -45,6 +48,6 @@ werden Sie zurück an die „/adfs&quot;-Seite geleitet, welche Sie in der „se
 </br>
 Nachdem der erste Schritt erfolgreich durchgelaufen ist, werden nun die Daten, also die Gruppe aus dem AD, 
 welche von dem SAML Request zurückgekommen ist, in einer Session gespeichert. Von dort aus wird geprüft, 
-ob der Nutzer, welcher sich erst gerade per SSO authentifiziert hat, schon ein Backend-Nutzer in Contao 
-ist. Falls das nicht der Fall sein sollte, wird der Nutzer als Backend-Nutzer in Contao angelegt.</br>
-Nach jeder erfolgreichen Authentifizierung wird das Passwort des Backend-Nutzers aktualisiert.
+ob der Nutzer, welcher sich erst gerade per SSO authentifiziert hat, schon ein Backend- und Frontend Nutzer 
+in Contao ist. Falls das nicht der Fall sein sollte, wird der Nutzer in Contao angelegt.</br>
+Nach jeder erfolgreichen Authentifizierung wird das Passwort des Backend- und Frontend Nutzers aktualisiert.
