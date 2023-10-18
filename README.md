@@ -1,7 +1,8 @@
 ![Alt text](docs/logo.svg?raw=true "logo")
 
 # **Contao Microsoft SSO Bundle**
-Mit dem Contao Microsoft SSO Bundle der BROCKHAUS AG melden Sie sich bequem per SSO im Contao-Backend an.
+Mit dem Contao Microsoft SSO Bundle der BROCKHAUS AG melden Sie sich bequem per SSO im Contao-Backend
+oder als Frontend-Mitglied an.
 
 ## **Wofür ist das Bundle gut?**
 Das Contao Microsoft SSO Bundle ermöglicht eine Authentifizierung per Microsoft SSO bei Ihrem Active 
