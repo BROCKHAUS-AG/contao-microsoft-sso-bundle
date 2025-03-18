@@ -11,7 +11,7 @@ services:
             - '%kernel.project_dir%'
         public: true
         calls:
-            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]
+            - [ setContainer, [ '@service_container' ] ]
 
     BrockhausAg\ContaoMicrosoftSsoBundle\Controller\AdfsMemberController:
         arguments:
@@ -25,4 +25,4 @@ services:
             - '%kernel.project_dir%'
         public: true
         calls:
-            - [ setContainer, [ '@Psr\Container\ContainerInterface' ] ]
+            - [ setContainer, [ '@service_container' ] ]

@@ -25,18 +25,18 @@
     },
     "require": {
         "php": ">=7.4",
-        "contao/core-bundle": "^4.9",
-        "symfony/config": "^4.2 || ^5.1",
-        "symfony/dependency-injection": "^4.2 || ^5.1",
-        "symfony/http-kernel": "^4.2 || ^5.1",
-        "twig/twig": "^2.12 || ^3.0",
+        "contao/core-bundle": "5.3.*",
+        "symfony/config": "*",
+        "symfony/dependency-injection": "*",
+        "symfony/http-kernel": "*",
+        "twig/twig": "*",
         "ext-gd": "*",
         "ext-curl": "*",
         "ext-json": "*"
     },
     "require-dev": {
-        "contao/manager-plugin": "^2.3",
-        "symfony/http-client": "4.4.*"
+        "contao/manager-plugin": "*",
+        "symfony/http-client": "*"
     },
     "autoload": {
         "psr-4": {
