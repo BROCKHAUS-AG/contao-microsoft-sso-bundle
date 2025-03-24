@@ -1,5 +1,4 @@
 {
-    "version": "1.1",
     "name": "brockhaus-ag/contao-microsoft-sso-bundle",
     "description": "Mit dem Contao Microsoft SSO Bundle der BROCKHAUS AG, können Sie sich ganz bequem per SSO im Contao Backend anmelden.",
     "homepage": "https://www.brockhaus-ag.de",
