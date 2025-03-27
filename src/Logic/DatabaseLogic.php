@@ -37,14 +37,12 @@ class DatabaseLogic {
             ->set("language", ":language")
             ->set("email", ":email")
             ->set("admin", ":admin")
-            ->set("et_enable", ":et_enable")
             ->where("username =:username")
             ->setParameter("password", $hash)
             ->setParameter("name", $user->getFirstname(). " ". $user->getLastname())
             ->setParameter("language", "de")
             ->setParameter("email", $user->getUsername())
             ->setParameter("admin", $admin)
-            ->setParameter("et_enable", 1)
             ->setParameter("username", $user->getUsername())
             ->execute();
     }
@@ -63,7 +61,6 @@ class DatabaseLogic {
                     "language" => "?",
                     "email" => "?",
                     "admin" => "?",
-                    "et_enable" => "?",
                     "username" => "?"
                 ]
             )
@@ -75,8 +72,7 @@ class DatabaseLogic {
                     3 => "de",
                     4 => $user->getUsername(),
                     5 => $admin,
-                    6 => 1,
-                    7 => $user->getUsername()
+                    6 => $user->getUsername()
                 ]
             )
             ->execute();

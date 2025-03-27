@@ -37,7 +37,7 @@ class IOLogic {
             $errorMessage = 'File: "'. $file. " could not be found. Please create it!";
             $this->_logger->log(
                 LogLevel::WARNING, $errorMessage,
-                ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
+                ['contao' => new ContaoContext(__METHOD__, 'TL_ACCESS')]
             );
             echo $errorMessage;
             exit();

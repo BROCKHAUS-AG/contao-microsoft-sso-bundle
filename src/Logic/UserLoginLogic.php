@@ -59,7 +59,7 @@ class UserLoginLogic
 
     private function getToken($user) : UsernamePasswordToken
     {
-        $token = new UsernamePasswordToken($user, null, "contao_backend", $user->getRoles());
+        $token = new UsernamePasswordToken($user, "Bananenbrot", $user->getRoles());
         $this->_tokenStorage->setToken($token);
         return $token;
     }
@@ -84,7 +84,7 @@ class UserLoginLogic
         $this->_logger->log(
             LogLevel::INFO,
             'User "'. $username. '" was logged in automatically',
-            ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
+            ['contao' => new ContaoContext(__METHOD__, 'TL_ACCESS')]
         );
 
         return new Response($this->_twig->render(
@@ -98,13 +98,9 @@ class UserLoginLogic
     public function login(string $username) : Response
     {
         $session = $this->_requestStack->getCurrentRequest()->getSession();
-        $userProvider = new ContaoUserProvider($this->_framework, $session, BackendUser::class, $this->_logger);
+        $userProvider = new ContaoUserProvider($this->_framework, BackendUser::class, BackendUser::class, $this->_logger);
 
-        try {
-            $user = $userProvider->loadUserByUsername($username);
-        } catch (UsernameNotFoundException $exception) {
-            return $this->_failureLogic->usernameNotFound($username, $exception);
-        }
+        $user = $userProvider->loadUserByIdentifier($username);
 
         $token = $this->getToken($user);
         $this->setTokenToContaoBackend($session, $token);

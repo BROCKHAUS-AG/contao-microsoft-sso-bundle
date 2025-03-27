@@ -42,7 +42,7 @@ class FailureLogic
         $this->_logger->log(
             LogLevel::WARNING,
             'Username "'. $username. '" not found for auto login',
-            ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
+            ['contao' => new ContaoContext(__METHOD__, 'TL_ACCESS')]
         );
 
         return new Response($this->_twig->render(

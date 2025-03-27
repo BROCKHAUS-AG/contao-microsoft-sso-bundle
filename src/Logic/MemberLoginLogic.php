@@ -85,7 +85,7 @@ class MemberLoginLogic
         $this->_logger->log(
             LogLevel::INFO,
             'User "'. $username. '" was logged in automatically',
-            ['contao' => new ContaoContext(__METHOD__, TL_ACCESS)]
+            ['contao' => new ContaoContext(__METHOD__, 'TL_ACCESS')]
         );
 
         return new Response($this->_twig->render(
